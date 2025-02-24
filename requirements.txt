@@ -1,0 +1,7 @@
+torch
+torchaudio
+whisper
+librosa
+numpy
+soundfile
+ffmpeg-python
