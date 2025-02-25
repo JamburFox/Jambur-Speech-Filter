@@ -1,6 +1,6 @@
 torch
 torchaudio
-whisper
+openai_whisper
 librosa
 numpy
 soundfile

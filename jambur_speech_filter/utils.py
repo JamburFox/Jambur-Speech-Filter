@@ -32,7 +32,10 @@ def save_audio(audio: np.ndarray, sr: int, save_path: str):
     
     sf.write(save_path, audio, sr)
 
+def extract_audio_from_video(video_file: str, output_file: str):
+    ffmpeg.input(video_file).output(output_file).run(overwrite_output=True, quiet=True)
+
 def combine_audio_video_files(video_file: str, audio_file: str, output_file: str):
     video = ffmpeg.input(video_file)
     audio = ffmpeg.input(audio_file)
-    ffmpeg.concat(video, audio, v=1, a=1).output(output_file).run(overwrite_output=True)
+    ffmpeg.concat(video, audio, v=1, a=1).output(output_file).run(overwrite_output=True, quiet=True)

@@ -1,0 +1,8 @@
+.git
+.*ignore
+ffmpeg/
+temp/
+*.log
+.cache/
+run-docker.sh
+run-docker.bat

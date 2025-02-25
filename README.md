@@ -1,6 +1,8 @@
 # Jambur-Speech-Filter
 A Python project which filters certain words and phrases from audio/video
 
+This project utilizes a local build of [FFmpeg](https://ffmpeg.org) as a dependency. The local FFmpeg will be automatically configured for use if no existing FFmpeg installation is found in your system's PATH.
+
 # Setup
 To setup this project, we begin by ensuring Python is installed: [Python Download](https://www.python.org/downloads/). It's recommended to create a virtual environment before installing the requirements to prevent conflicts with your existing python setup. You can then install the necessary packages by running the following command in the project root directory: `pip install -r ./requirements.txt`.
 

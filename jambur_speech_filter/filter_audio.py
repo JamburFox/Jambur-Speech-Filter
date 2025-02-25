@@ -24,6 +24,7 @@ def censor_all_phrases(audio_array: np.ndarray, sr: int, alignments: list[dict],
 
 def filter_audio(filtered_phrases: list[str], audio_file: str, audio_output_file: str):
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device: {device}")
 
     whisperModel = WhisperModel(device)
     aligner = JamburAligner(device)
