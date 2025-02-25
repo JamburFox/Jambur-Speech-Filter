@@ -3,6 +3,7 @@ import os
 import sys
 import shutil
 import platform
+import torch
 
 from jambur_speech_filter.filter_audio import filter_audio
 from jambur_speech_filter.utils import combine_audio_video_files, load_filtered_phrases, extract_audio_from_video
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the speaker id model.')
     parser.add_argument('--media_file', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "test.wav"), help='the source media file')
     parser.add_argument('--output_file', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_modified.wav"), help='the source media file')
+    parser.add_argument('--audio_bitrate', type=str, default="192k", help='the output audio bitrate')
     args = parser.parse_args()
 
     TEMP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp')
@@ -41,17 +43,20 @@ if __name__ == "__main__":
 
     filtered_phrases = load_filtered_phrases(FILTER_LIST_PATH)
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device: {device}")
+
     if file_is_video(args.media_file) and file_is_video(args.output_file):
         print("Filtering Video...")
         extract_audio_from_video(args.media_file, TEMP_AUDIO_FILE)
-        filter_audio(filtered_phrases, TEMP_AUDIO_FILE, TEMP_AUDIO_FILE)
+        filter_audio(filtered_phrases, TEMP_AUDIO_FILE, TEMP_AUDIO_FILE, device)
 
         print("Exporting Updated Video...")
-        combine_audio_video_files(args.media_file, TEMP_AUDIO_FILE, args.output_file)
+        combine_audio_video_files(args.media_file, TEMP_AUDIO_FILE, args.output_file, args.audio_bitrate)
 
     elif file_is_audio(args.media_file) and file_is_audio(args.output_file):
-        print("Filtering Audio...")
-        filter_audio(filtered_phrases, args.media_file, args.output_file)
+        print("Filtering and Exporting Audio...")
+        filter_audio(filtered_phrases, args.media_file, args.output_file, device)
 
     else:
         print("File type not supported!")
