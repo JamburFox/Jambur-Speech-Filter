@@ -33,4 +33,4 @@ def filter_audio(filtered_phrases: list[str], audio_file: str, audio_output_file
 
     modified_audio_array = censor_all_phrases(audio_data, sr, alignments, filtered_phrases)
 
-    save_audio(audio_data, sr, audio_output_file, sub_type)
+    save_audio(modified_audio_array, sr, audio_output_file, sub_type)
