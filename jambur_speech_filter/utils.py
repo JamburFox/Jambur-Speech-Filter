@@ -39,11 +39,13 @@ def convert_stereo_to_mono(waveform: np.ndarray):
         mono_waveform = np.mean(waveform, axis=1)
     return mono_waveform
 
-def save_audio(audio: np.ndarray, sr: int, save_path: str, subtype: str="PCM_16"):
-    path = os.path.dirname(save_path)
+def create_folders(full_path: str):
+    path = os.path.dirname(full_path)
     if not is_none_or_whitespace(path):
         os.makedirs(path, exist_ok=True)
-    
+
+def save_audio(audio: np.ndarray, sr: int, save_path: str, subtype: str="PCM_16"):
+    create_folders(save_path)
     sf.write(save_path, audio, sr, subtype=subtype)
 
 def extract_audio_from_video(video_file: str, output_file: str):
@@ -57,3 +59,7 @@ def combine_audio_video_files(video_file: str, audio_file: str, output_file: str
         ffmpeg.output(video['v'], audio['a'], output_file, vcodec='copy', audio_bitrate=audio_bitrate).run(overwrite_output=True, quiet=True)
     else:
         ffmpeg.output(video['v'], audio['a'], output_file, vcodec='copy').run(overwrite_output=True, quiet=True)
+
+def delete_file(file_path: str):
+    if os.path.exists(file_path):
+        os.remove(file_path)

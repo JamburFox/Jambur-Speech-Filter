@@ -5,3 +5,4 @@ librosa
 numpy
 soundfile
 ffmpeg-python
+flask
