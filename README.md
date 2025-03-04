@@ -26,6 +26,8 @@ To filter phrases out of the desired audio / video file we can run this command 
 
 test.mp4 can be replaced with the location of any audio or video file you want to filter and test_modified.mp4 can be replaced with the name of the audio or video output save location. --audio_bitrate (by default 192k) can also be set to customize the audio bitrate of the modified file.
 
+You can also add the argument `--filter_file xyz.wav` to play audio over the muted segments.
+
 # Updating Filter List
 > **WARNING**: The current filter list includes exposed words or phrases that might be considered offensive, given its customizable nature. These words are not intended to offend; their presence is solely for the purpose of filtering such language.
 ```

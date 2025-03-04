@@ -35,7 +35,7 @@ def create_temp_folder():
     print(f"Making Folders: {TEMP_AUDIO_FILE}")
     create_folders(TEMP_PATH)
 
-def process_file(media_file: str, output_file: str, audio_bitrate: str = "192k"):
+def process_file(media_file: str, output_file: str, filter_file: str = None, audio_bitrate: str = "192k"):
     if not is_ffmpeg_in_path():
         if "windows" in SYSTEM:
             print("FFmpeg is not found in path! Updating Path to use local FFmpeg")
@@ -48,10 +48,12 @@ def process_file(media_file: str, output_file: str, audio_bitrate: str = "192k")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
 
+    #load filter file
+
     if file_is_video(media_file) and file_is_video(output_file):
         print("Filtering Video...")
         extract_audio_from_video(media_file, TEMP_AUDIO_FILE)
-        filter_audio(filtered_phrases, TEMP_AUDIO_FILE, TEMP_AUDIO_FILE, device)
+        filter_audio(filtered_phrases, TEMP_AUDIO_FILE, TEMP_AUDIO_FILE, filter_file, device)
 
         print("Exporting Updated Video...")
         combine_audio_video_files(media_file, TEMP_AUDIO_FILE, output_file, audio_bitrate)
@@ -63,10 +65,7 @@ def process_file(media_file: str, output_file: str, audio_bitrate: str = "192k")
 
     elif file_is_audio(media_file) and file_is_audio(output_file):
         print("Filtering and Exporting Audio...")
-        filter_audio(filtered_phrases, media_file, output_file, device)
-
-        #cleanup temp folder
-        delete_file(TEMP_AUDIO_FILE)
+        filter_audio(filtered_phrases, media_file, output_file, filter_file, device)
 
         return output_file
     
@@ -78,12 +77,13 @@ def process_file(media_file: str, output_file: str, audio_bitrate: str = "192k")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the speaker id model.')
     parser.add_argument('--media_file', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "test.wav"), help='the source media file')
-    parser.add_argument('--output_file', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_modified.wav"), help='the source media file')
+    parser.add_argument('--output_file', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_modified.wav"), help='the filtered media file save location')
+    parser.add_argument('--filter_file', type=str, default=None, help='the audio file to play over filtered segments')
     parser.add_argument('--audio_bitrate', type=str, default="192k", help='the output audio bitrate')
     args = parser.parse_args()
 
     create_temp_folder()
-    file_out = process_file(args.media_file, args.output_file, args.audio_bitrate)
+    file_out = process_file(media_file=args.media_file, output_file=args.output_file, filter_file=args.filter_file, audio_bitrate=args.audio_bitrate)
     if not file_out:
         sys.exit(1)
 

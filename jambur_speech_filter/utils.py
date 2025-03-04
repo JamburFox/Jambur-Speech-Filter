@@ -21,8 +21,13 @@ def load_filtered_phrases(filter_list_path: str) -> list[str]:
                 filtered_phrases.append(normalized_line)
     return filtered_phrases
 
-def load_audio(audio_file: str) -> tuple[np.ndarray, int, str]:
+def load_audio(audio_file: str, target_sr: int = None) -> tuple[np.ndarray, int, str]:
     audio_data, sr = sf.read(audio_file, always_2d=True)
+
+    #resample if needed
+    if target_sr is not None and sr != target_sr:
+        audio_data = librosa.resample(y=audio_data, orig_sr=sr, target_sr=target_sr, axis=0)
+        sr = target_sr
 
     if audio_data.ndim < 2:
         audio_data = audio_data.reshape(-1, 1)
@@ -38,6 +43,18 @@ def convert_stereo_to_mono(waveform: np.ndarray):
     if mono_waveform.ndim > 1 and mono_waveform.shape[1] > 1:
         mono_waveform = np.mean(waveform, axis=1)
     return mono_waveform
+
+def trim_silence(array: np.ndarray, silence_threshold: int = 0.01, required_silence_length: int = 100) -> np.ndarray:
+    concurrent_silence = 0
+    mask = np.full(array.shape[0], True, dtype=bool)
+    for i in range(0, array.shape[0]):
+        volume = np.sum(array[i, :])/2
+        concurrent_silence = concurrent_silence + 1 if volume < silence_threshold else 0
+        if concurrent_silence >= required_silence_length:
+            mask[i] = False
+
+    filtered_array = array[mask]
+    return filtered_array
 
 def create_folders(full_path: str):
     path = os.path.dirname(full_path)

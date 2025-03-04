@@ -23,11 +23,23 @@ def process():
     save_path = get_temp_path(f"temp_download{file_extension}")
     out_path = get_temp_path(f"temp_processed{file_extension}")
 
+    filter_file = request.files['filter_file']
+    filter_file_exist = filter_file.filename.strip() != ""
+    if filter_file_exist:
+        filter_filename = filter_file.filename
+        filter_file_extension = os.path.splitext(filter_filename)[1]
+        filter_save_path = get_temp_path(f"temp_filter_download{filter_file_extension}")
+
     with io.BytesIO(file.read()) as buffer:
         with open(get_temp_path(save_path), 'wb') as out_file:
             out_file.write(buffer.getbuffer())
 
-    file_location = process_file(save_path, out_path)
+    if filter_file_exist:
+        with io.BytesIO(filter_file.read()) as buffer:
+            with open(get_temp_path(filter_save_path), 'wb') as out_file:
+                out_file.write(buffer.getbuffer())
+
+    file_location = process_file(media_file=save_path, output_file=out_path, filter_file=filter_save_path if filter_file_exist else None)
     if not file_location:
         return "Error processing Media", 500
 
@@ -38,6 +50,8 @@ def process():
     #cleanup temp folder
     delete_file(save_path)
     delete_file(out_path)
+    if filter_file_exist:
+        delete_file(filter_save_path)
 
     return send_file(
         upload_buffer,
